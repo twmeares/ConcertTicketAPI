@@ -1,3 +1,4 @@
+using System.Data.Common;
 using ConcertTicketAPI.Models;
 
 namespace ConcertTicketAPI.Repositories;
@@ -7,7 +8,8 @@ namespace ConcertTicketAPI.Repositories;
 /// </summary>
 public interface IConcertRepository
 {
-    void AddEvent(Event ev);
+    Task AddEventAsync(Event ev);
+    Task<Event?> UpdateEventAsync(Event ev);
     Task<Event?> GetEventByIdAsync(Guid id);
     Task<List<Event>> GetAllEventsAsync();
 }

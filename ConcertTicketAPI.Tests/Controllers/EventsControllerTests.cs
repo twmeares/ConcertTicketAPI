@@ -17,7 +17,7 @@ public class EventsControllerTests
 {
     public EventsControllerTests()
     {
-        
+
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public class EventsControllerTests
         };
 
         var repo = new InMemoryConcertRepository();
-        repo.AddEvent(ev);
+        await repo.AddEventAsync(ev);
 
         var eventService = new EventService(new LoggerFactory().CreateLogger<EventService>(), repo);
 
@@ -49,4 +49,6 @@ public class EventsControllerTests
         Assert.Equal("Test Event", response.Name);
         Assert.Contains(response.TicketTypes, t => t == TicketTypes.GeneralAdmission);
     }
+    
+    //TODO create test for other methods in EventsController
 }

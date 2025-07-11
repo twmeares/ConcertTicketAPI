@@ -1,3 +1,4 @@
+using ConcertTicketAPI.DTOs;
 using ConcertTicketAPI.Models;
 using ConcertTicketAPI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -48,4 +49,48 @@ public class EventsController : ControllerBase
             return StatusCode(500, errorMsg);
         }
     }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateEvent([FromBody] EventRequest request)
+    {
+        if (request == null)
+        {
+            return BadRequest("Invalid event data");
+        }
+
+        try
+        {
+            var createdEvent = await _eventService.CreateEvent(request);
+            return CreatedAtAction(nameof(CreateEvent), new { id = createdEvent.Id }, createdEvent);
+        }
+        catch (Exception ex)
+        {
+            var errorMsg = "Error creating event";
+            _logger.LogError(ex, errorMsg);
+            return StatusCode(500, errorMsg);
+        }
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateEvent(Guid id, [FromBody] EventRequest request)
+    {
+        if (request == null || id != request.Id)
+        {
+            return BadRequest("Invalid event data");
+        }
+
+        try
+        {
+            var updated = await _eventService.UpdateEvent(request);
+            return updated != null ? Ok(updated) : NotFound();
+        }
+        catch (Exception ex)
+        {
+            var errorMsg = "Error updating event";
+            _logger.LogError(ex, errorMsg);
+            return StatusCode(500, errorMsg);
+        }
+    }
+
+    // NOTE: skipping patch implementation due to time constraints
 }

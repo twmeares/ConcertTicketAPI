@@ -15,9 +15,22 @@ public class InMemoryConcertRepository : IConcertRepository
         _events = new List<Event>();
     }
 
-    public void AddEvent(Event ev)
+    public Task AddEventAsync(Event ev)
     {
         _events.Add(ev);
+        return Task.CompletedTask;
+    }
+
+    public Task<Event?> UpdateEventAsync(Event ev)
+    {
+        var existingEvent = _events.FirstOrDefault(e => e.Id == ev.Id);
+        if (existingEvent != null)
+        {
+            //replace existing with updated event
+            _events[_events.IndexOf(existingEvent)] = ev;
+            return Task.FromResult<Event?>(ev);
+        }
+        return Task.FromResult<Event?>(null);
     }
 
     public Task<Event?> GetEventByIdAsync(Guid id)
@@ -30,4 +43,6 @@ public class InMemoryConcertRepository : IConcertRepository
     {
         return Task.FromResult(_events);
     }
+
+    
 }

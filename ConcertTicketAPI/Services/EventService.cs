@@ -15,6 +15,31 @@ public class EventService : IEventService
         _eventRepository = eventRepository;
     }
 
+    public Task<EventResponse> CreateEvent(EventRequest request)
+    {
+        var newEvent = new Event
+        {
+            Id = Guid.NewGuid(),
+            Name = request.Name,
+            Description = request.Description,
+            Venue = request.Venue,
+            date = request.date,
+            TicketTypes = request.TicketTypes
+        };
+
+        _eventRepository.AddEventAsync(newEvent);
+        
+        return Task.FromResult(new EventResponse
+        {
+            Id = newEvent.Id,
+            Name = newEvent.Name,
+            Description = newEvent.Description,
+            Venue = newEvent.Venue,
+            date = newEvent.date,
+            TicketTypes = newEvent.TicketTypes
+        });
+    }
+
     public async Task<IEnumerable<EventResponse>> GetAllEventsAsync()
     {
         var events = await _eventRepository.GetAllEventsAsync(); 
@@ -60,5 +85,33 @@ public class EventService : IEventService
         };
         return response;
     }
-    
+
+    public async Task<EventResponse?> UpdateEvent(EventRequest request)
+    {
+        var existingEvent = new Event
+        {
+            Id = request.Id ?? Guid.Empty, // Ensure Id is not null
+            Name = request.Name,
+            Description = request.Description,
+            Venue = request.Venue,
+            date = request.date,
+            TicketTypes = request.TicketTypes
+        };
+
+        var updatedEvent = await _eventRepository.UpdateEventAsync(existingEvent);
+        if (updatedEvent == null)
+        {
+            return null;
+        }
+
+        return new EventResponse
+        {
+            Id = updatedEvent.Id,
+            Name = updatedEvent.Name,
+            Description = updatedEvent.Description,
+            Venue = updatedEvent.Venue,
+            date = updatedEvent.date,
+            TicketTypes = updatedEvent.TicketTypes
+        };
+    }
 }

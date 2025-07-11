@@ -27,7 +27,7 @@ public class EventServiceTest
             TicketsRemaining = 50
         };
 
-        eventRepository.AddEvent(testEvent);
+        await eventRepository.AddEventAsync(testEvent);
 
         var result = await eventService.GetByIdAsync(eventId);
 
