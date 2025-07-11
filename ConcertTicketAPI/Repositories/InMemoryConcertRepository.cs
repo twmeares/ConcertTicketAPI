@@ -1,3 +1,4 @@
+using ConcertTicketAPI.DTOs;
 using ConcertTicketAPI.Models;
 
 namespace ConcertTicketAPI.Repositories;
@@ -44,5 +45,23 @@ public class InMemoryConcertRepository : IConcertRepository
         return Task.FromResult(_events);
     }
 
-    
+    public Task<List<Ticket>> GetAvailableTicketsByEventIdAsync(Guid eventId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<List<TicketResponse>> ReserveTicketsAsync(Guid eventId, List<TicketRequest> ticketRequests)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<List<TicketResponse>> CancelReservationAsync(Guid eventId, List<TicketRequest> ticketRequests)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<List<TicketResponse>> PurchaseTicketsAsync(Guid eventId, List<TicketRequest> ticketRequests)
+    {
+        throw new NotImplementedException();
+    }
 }
