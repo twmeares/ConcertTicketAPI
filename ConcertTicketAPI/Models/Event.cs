@@ -14,6 +14,6 @@ public class Event
     public required string Name { get; set; }
     public int Capacity { get; set; }
     public int TicketsRemaining { get; set; }
-    public TicketTypes TicketType { get; set; }
+    public List<TicketTypes> TicketTypes { get; set; } = new List<TicketTypes>();
 
 }
