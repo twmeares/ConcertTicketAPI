@@ -1,3 +1,5 @@
+using ConcertTicketAPI.Models;
+using ConcertTicketAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConcertTicketAPI.Controllers;
@@ -7,16 +9,43 @@ namespace ConcertTicketAPI.Controllers;
 public class EventsController : ControllerBase
 {
     private readonly ILogger<EventsController> _logger;
+    private readonly IEventService _eventService;
 
-    public EventsController(ILogger<EventsController> logger)
+    public EventsController(ILogger<EventsController> logger, IEventService eventService)
     {
         _logger = logger;
+        _eventService = eventService;
     }
 
     [HttpGet]
-    public IEnumerable<string> GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        //TODO: stub for basic compile test for now. Come back and fix this.
-        return ["event1", "event2"];
+        try
+        {
+            var events = await _eventService.GetAllEventsAsync();
+            return Ok(events);
+        }
+        catch (Exception ex)
+        {
+            var errorMsg = "Error retrieving events";
+            _logger.LogError(ex, errorMsg);
+            return StatusCode(500, errorMsg);
+        }
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        try
+        {
+            var ev = await _eventService.GetByIdAsync(id);
+            return ev == null ? NotFound() : Ok(ev);
+        }
+        catch (Exception ex)
+        {
+            var errorMsg = "Error retrieving event by ID";
+            _logger.LogError(ex, errorMsg);
+            return StatusCode(500, errorMsg);
+        }
     }
 }

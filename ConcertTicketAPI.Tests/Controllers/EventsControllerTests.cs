@@ -3,29 +3,50 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using ConcertTicketAPI;
 using System.Text.Json;
+using ConcertTicketAPI.Repositories;
+using ConcertTicketAPI.Services;
+using Microsoft.Extensions.Logging;
+using ConcertTicketAPI.Models;
+using ConcertTicketAPI.Controllers;
+using Microsoft.AspNetCore.Mvc;
+using ConcertTicketAPI.DTOs;
 
 namespace ConcertTicketAPI.Tests;
 
-public class EventsControllerTests : IClassFixture<WebApplicationFactory<Program>>
+public class EventsControllerTests
 {
-    private readonly HttpClient _client;
-    public EventsControllerTests(WebApplicationFactory<Program> factory)
+    public EventsControllerTests()
     {
-        _client = factory.CreateClient();
+        
     }
 
     [Fact]
-    public async Task GetAllEvents_ShouldReturnListOfEvent_WhenEventsExist()
+    public async Task GetById_ShouldReturnEvent_WhenEventsExist()
     {
-        //TODO: temp stand in test for now. Come back and add the real logic.
-        var response = await _client.GetAsync("/Events");
+        Guid eventId = Guid.NewGuid();
+        var ev = new Event()
+        {
+            Id = eventId,
+            Name = "Test Event",
+            Description = "Test Description",
+            Venue = "Test Venue",
+            date = DateTime.Now,
+            Capacity = 100,
+            TicketsRemaining = 50,
+            TicketTypes = new List<TicketTypes>() { TicketTypes.GeneralAdmission }
+        };
 
-        response.EnsureSuccessStatusCode();
+        var repo = new InMemoryConcertRepository();
+        repo.AddEvent(ev);
 
-        var json = await response.Content.ReadAsStringAsync();
-        Assert.False(string.IsNullOrEmpty(json));
-        var events = JsonSerializer.Deserialize<List<string>>(json);
-        Assert.True(events != null);
-        Assert.True(events.Count > 0);
+        var eventService = new EventService(new LoggerFactory().CreateLogger<EventService>(), repo);
+
+        var controller = new EventsController(new LoggerFactory().CreateLogger<EventsController>(), eventService);
+
+        var result = await controller.GetById(eventId);
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var response = Assert.IsType<EventResponse>(okResult.Value);
+        Assert.Equal("Test Event", response.Name);
+        Assert.Contains(response.TicketTypes, t => t == TicketTypes.GeneralAdmission);
     }
 }
