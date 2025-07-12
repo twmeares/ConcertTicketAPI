@@ -53,7 +53,7 @@ public class InMemoryConcertRepository : IConcertRepository
         var tickets = _tickets.Where(t => t.EventId == eventId && t.IsAvailable).ToList();
         return Task.FromResult(tickets);
     }
-    
+
     public Task<List<Ticket>> GetTicketsByTicketIdsAsync(List<Guid> ticketIds)
     {
         var tickets = _tickets.Where(t => ticketIds.Contains(t.Id)).ToList();
@@ -80,7 +80,7 @@ public class InMemoryConcertRepository : IConcertRepository
                 ticket.ReservedUntil = DateTime.UtcNow.AddMinutes(15); // reserve for 15 minutes, would make this configurable in a real app
             }
         }
-        return Task.FromResult(true); // return true if all tickets were reserved successfully
+        return Task.FromResult(true);
     }
 
     /// <summary>
@@ -100,7 +100,7 @@ public class InMemoryConcertRepository : IConcertRepository
         }
 
         // if number of tickets returned in ticketsToReserve doesn't equal number of tickets requested return false
-        // this is to prevent cancelling a reservation that has already been purchased
+        // this is to prevent cancelling a reservation that has already been purchased when not only marking non-purchased tickets
         if (ticketsToReserve.Count != ticketIds.Count)
         {
             // NOTE: in a real db, this would be a transaction that would fail if the tickets were not available
@@ -116,7 +116,7 @@ public class InMemoryConcertRepository : IConcertRepository
                 ticket.PurchaseDate = DateTime.MaxValue;
             }
         }
-        return Task.FromResult(true); // return true if all reservations were cancelled successfully
+        return Task.FromResult(true);
     }
 
     public Task<bool> CancelReservationAsync(Guid userId, List<Guid> ticketIds)
@@ -147,13 +147,13 @@ public class InMemoryConcertRepository : IConcertRepository
         }
         else
         {
-            // remove reservation for each ticket
+            // mark tickets as purchased
             foreach (var ticket in reservedTickets)
             {
                 ticket.PurchaseDate = DateTime.UtcNow; // set purchase date to now
             }
         }
-        return Task.FromResult(true); // return true if all reservations were cancelled successfully
+        return Task.FromResult(true);
     }
 
     public Task AddTicketsAsync(List<Ticket> tickets)
@@ -163,5 +163,12 @@ public class InMemoryConcertRepository : IConcertRepository
             _tickets.Add(ticket);
         }
         return Task.CompletedTask;
+    }
+
+    // Clear in memory repo. Used for testing purposes to reset the state.
+    public void Clear()
+    {
+        _events.Clear();
+        _tickets.Clear();
     }
 }

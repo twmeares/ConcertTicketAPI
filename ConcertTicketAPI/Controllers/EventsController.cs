@@ -40,7 +40,12 @@ public class EventsController : ControllerBase
         try
         {
             var ev = await _eventService.GetByIdAsync(id);
-            return ev == null ? NotFound() : Ok(ev);
+            if (ev == null)
+            {
+                _logger.LogInformation($"Event with ID {id} not found.");
+                return NotFound("Event not found.");
+            }
+            return Ok(ev);
         }
         catch (Exception ex)
         {
@@ -82,7 +87,12 @@ public class EventsController : ControllerBase
         try
         {
             var updated = await _eventService.UpdateEvent(request);
-            return updated != null ? Ok(updated) : NotFound();
+            if (updated == null)
+            {
+                _logger.LogInformation($"Event with ID {id} not found for update.");
+                return NotFound("Event not found.");
+            }
+            return Ok(updated);
         }
         catch (Exception ex)
         {

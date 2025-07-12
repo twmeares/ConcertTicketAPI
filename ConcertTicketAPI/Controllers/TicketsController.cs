@@ -129,7 +129,7 @@ public class TicketsController : ControllerBase
         try
         {
             var createdTickets = await _ticketService.CreateTicketsAsync(tickets);
-            return CreatedAtAction(nameof(GetAvailableTicketsByEventId), new { eventId = tickets.First().EventId }, createdTickets);
+            return CreatedAtAction(nameof(CreateTickets), new { eventId = tickets.First().EventId }, createdTickets);
         }
         catch (Exception ex)
         {
