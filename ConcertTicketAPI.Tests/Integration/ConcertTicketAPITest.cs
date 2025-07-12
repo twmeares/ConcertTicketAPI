@@ -76,7 +76,7 @@ public class ConcertTicketAPITests : IClassFixture<WebApplicationFactory<Program
                 TicketType = TicketTypes.GeneralAdmission,
             }
         };
-        var createTicketResponse = await _client.PostAsJsonAsync("/Tickets/create-tickets", tickets);
+        var createTicketResponse = await _client.PostAsJsonAsync("/Tickets", tickets);
         createTicketResponse.EnsureSuccessStatusCode();
 
         var createdTickets = await createTicketResponse.Content.ReadFromJsonAsync<List<TicketResponse>>();
@@ -106,7 +106,7 @@ public class ConcertTicketAPITests : IClassFixture<WebApplicationFactory<Program
         Assert.True(reserveResult.Success);
 
         // cancel ticket reservation
-        var cancelResponse = await _client.PostAsJsonAsync("/Tickets/cancel-reservation", reserveRequest);
+        var cancelResponse = await _client.PostAsJsonAsync("/Tickets/cancel", reserveRequest);
         cancelResponse.EnsureSuccessStatusCode();
 
         var cancelResult = await cancelResponse.Content.ReadFromJsonAsync<TicketTransactionResponse>();

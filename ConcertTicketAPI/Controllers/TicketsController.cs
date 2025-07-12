@@ -91,7 +91,7 @@ public class TicketsController : ControllerBase
         }
     }
 
-    [HttpPost("cancel-reservation")]
+    [HttpPost("cancel")]
     public async Task<IActionResult> CancelReservation([FromBody] TicketRequest ticketRequest)
     {
         if (ticketRequest == null || !ticketRequest.TicketIds.Any() || ticketRequest.UserId == Guid.Empty)
@@ -117,7 +117,7 @@ public class TicketsController : ControllerBase
         }
     }
 
-    [HttpPost("create-tickets")]
+    [HttpPost]
     public async Task<IActionResult> CreateTickets([FromBody] List<CreateTicketRequest> tickets)
     {
         if (tickets == null || !tickets.Any())
