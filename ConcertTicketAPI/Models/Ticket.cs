@@ -5,7 +5,11 @@ public class Ticket
     public Guid Id { get; set; }
     public Guid EventId { get; set; } // DB foreign key to Event
     public Guid UserId { get; set; } // Would map as DB foreign key to User table if I had more time
-    public DateTime PurchaseDate { get; set; }
+    public DateTime PurchaseDate { get; set; } = DateTime.MaxValue; // Default to MaxValue to indicate not purchased yet
+    public DateTime ReservedUntil { get; set; } = DateTime.MinValue ; // Default to MinValue to indicate not reserved
+
+    // Ticket is available if reservation has expired and they have a future purchase date (aka not yet purchased)
+    public bool IsAvailable => ReservedUntil < DateTime.UtcNow && PurchaseDate > DateTime.Now; 
     public TicketTypes TicketType { get; set; }
     public decimal Price { get; set; }
 

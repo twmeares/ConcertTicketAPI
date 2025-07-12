@@ -17,7 +17,10 @@ public interface IConcertRepository
 
     //ticket methods
     Task<List<Ticket>> GetAvailableTicketsByEventIdAsync(Guid eventId);
-    Task<List<TicketResponse>> ReserveTicketsAsync(Guid eventId, List<TicketRequest> ticketRequests);
-    Task<List<TicketResponse>> CancelReservationAsync(Guid eventId, List<TicketRequest> ticketRequests);
-    Task<List<TicketResponse>> PurchaseTicketsAsync(Guid eventId, List<TicketRequest> ticketRequests);
+    Task<List<Ticket>> GetTicketsByTicketIdsAsync(List<Guid> ticketIds);
+    Task<bool> ReserveTicketsAsync(Guid userId, List<Guid> ticketIds);
+    Task<bool> CancelReservationAsync(Guid userId, List<Guid> ticketIds);
+    Task<bool> CancelPurchaseAsync(Guid userId, List<Guid> ticketIds);
+    Task<bool> PurchaseTicketsAsync(Guid userId, List<Guid> ticketIds);
+    
 }
