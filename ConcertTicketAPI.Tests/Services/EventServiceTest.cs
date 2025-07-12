@@ -22,7 +22,7 @@ public class EventServiceTest
             Name = "Test Concert",
             Venue = "Test Venue",
             Description = "Test Description",
-            date = DateTime.Now,
+            date = DateTime.UtcNow,
             Capacity = 100,
             TicketsRemaining = 50
         };

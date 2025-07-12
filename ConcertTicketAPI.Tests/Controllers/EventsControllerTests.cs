@@ -30,7 +30,7 @@ public class EventsControllerTests
             Name = "Test Event",
             Description = "Test Description",
             Venue = "Test Venue",
-            date = DateTime.Now,
+            date = DateTime.UtcNow,
             Capacity = 100,
             TicketsRemaining = 50,
             TicketTypes = new List<TicketTypes>() { TicketTypes.GeneralAdmission }

@@ -5,6 +5,7 @@ using ConcertTicketAPI.Services;
 using Microsoft.Extensions.Logging;
 
 namespace ConcertTicketAPI.Tests.Services;
+
 public class TicketServiceTest
 {
     [Fact]
@@ -23,7 +24,7 @@ public class TicketServiceTest
             Name = "Test Concert",
             Venue = "Test Venue",
             Description = "Test Description",
-            date = DateTime.Now,
+            date = DateTime.UtcNow,
             Capacity = 100,
             TicketsRemaining = 50
         };
@@ -43,4 +44,6 @@ public class TicketServiceTest
         Assert.Equal(2, result.Count);
         Assert.Equal(eventId, result[0].EventId);
     }
+    
+    // TODO: Add more tests the other TicketService methods
 }

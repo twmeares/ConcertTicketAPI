@@ -5,7 +5,7 @@ namespace ConcertTicketAPI.DTOs;
 public class TicketRequest
 {
     public Guid EventId { get; set; }
-    public required List<Guid> ticketIds { get; set; }
+    public required List<Guid> TicketIds { get; set; }
     public Guid UserId { get; set; }
 
 }

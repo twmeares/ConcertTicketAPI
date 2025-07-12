@@ -42,7 +42,7 @@ public class TicketService : ITicketService
 
     public async Task<TicketTransactionResponse> ReserveTicketsAsync(TicketRequest ticketRequest)
     {
-        var ticketIds = ticketRequest.ticketIds;
+        var ticketIds = ticketRequest.TicketIds;
         var userId = ticketRequest.UserId;
         // attempt to find the tickets based on ticket id in request list
         var ticketsToReserve = await _ticketRepository.GetTicketsByTicketIdsAsync(ticketIds);
@@ -79,7 +79,7 @@ public class TicketService : ITicketService
     public async Task<TicketTransactionResponse> CancelReservationAsync(TicketRequest ticketRequest)
     {
 
-        var ticketIds = ticketRequest.ticketIds;
+        var ticketIds = ticketRequest.TicketIds;
         var userId = ticketRequest.UserId;
         // attempt to cancel reservation for any tickets in the request that are still reserved by the current user
         var success = await _ticketRepository.CancelReservationAsync(userId, ticketIds);
@@ -101,7 +101,7 @@ public class TicketService : ITicketService
 
     public async Task<TicketTransactionResponse> PurchaseTicketsAsync(TicketRequest ticketRequest)
     {
-        var ticketIds = ticketRequest.ticketIds;
+        var ticketIds = ticketRequest.TicketIds;
         var userId = ticketRequest.UserId;
         // attempt to find the tickets based on ticket id in request list
         var ticketsToPurchase = await _ticketRepository.GetTicketsByTicketIdsAsync(ticketIds);
@@ -109,7 +109,7 @@ public class TicketService : ITicketService
 
         // filter to find tickets that are still reserved by the user and haven't been purchased
         ticketsToPurchase = ticketsToPurchase
-            .Where(t => t.UserId == userId && t.PurchaseDate < DateTime.Now && t.ReservedUntil > DateTime.UtcNow).ToList();
+            .Where(t => t.UserId == userId && t.PurchaseDate > DateTime.UtcNow && t.ReservedUntil > DateTime.UtcNow).ToList();
 
         // if number of tickets available doesn't equal number of tickets requested, throw exception
         if (ticketsToPurchase.Count != ticketIds.Count)

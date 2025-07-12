@@ -96,7 +96,7 @@ public class InMemoryConcertRepository : IConcertRepository
         if (onlyMarkNonPurchased)
         {
             // if only marking non-purchased tickets, filter out those that have been purchased
-            ticketsToReserve = ticketsToReserve.Where(t => t.PurchaseDate > DateTime.Now).ToList();
+            ticketsToReserve = ticketsToReserve.Where(t => t.PurchaseDate > DateTime.UtcNow).ToList();
         }
 
         // if number of tickets returned in ticketsToReserve doesn't equal number of tickets requested return false
@@ -135,7 +135,7 @@ public class InMemoryConcertRepository : IConcertRepository
     {
         // attempt to find tickets that are still reserved by the user and haven't been purchased
         var reservedTickets = _tickets
-            .Where(t => ticketIds.Contains(t.Id) && t.UserId == userId && t.PurchaseDate < DateTime.Now && t.ReservedUntil > DateTime.UtcNow)
+            .Where(t => ticketIds.Contains(t.Id) && t.UserId == userId && t.PurchaseDate > DateTime.UtcNow && t.ReservedUntil > DateTime.UtcNow)
             .ToList();
 
         // if number of tickets returned in reservedTickets doesn't equal the number of tickets requested return false

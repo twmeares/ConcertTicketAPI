@@ -9,7 +9,7 @@ public class Ticket
     public DateTime ReservedUntil { get; set; } = DateTime.MinValue ; // Default to MinValue to indicate not reserved
 
     // Ticket is available if reservation has expired and they have a future purchase date (aka not yet purchased)
-    public bool IsAvailable => ReservedUntil < DateTime.UtcNow && PurchaseDate > DateTime.Now; 
+    public bool IsAvailable => ReservedUntil < DateTime.UtcNow && PurchaseDate > DateTime.UtcNow; 
     public TicketTypes TicketType { get; set; }
     public decimal Price { get; set; }
 
