@@ -22,5 +22,6 @@ public interface IConcertRepository
     Task<bool> CancelReservationAsync(Guid userId, List<Guid> ticketIds);
     Task<bool> CancelPurchaseAsync(Guid userId, List<Guid> ticketIds);
     Task<bool> PurchaseTicketsAsync(Guid userId, List<Guid> ticketIds);
+    Task AddTicketsAsync(List<Ticket> tickets);
     
 }

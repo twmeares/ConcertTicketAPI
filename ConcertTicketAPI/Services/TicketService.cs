@@ -1,4 +1,5 @@
 using ConcertTicketAPI.DTOs;
+using ConcertTicketAPI.Models;
 using ConcertTicketAPI.Repositories;
 using ConcertTicketAPI.Services;
 
@@ -52,12 +53,18 @@ public class TicketService : ITicketService
         // if number of tickets available doesn't equal number of tickets requested, throw exception
         if (ticketsToReserve.Count != ticketIds.Count)
         {
-            throw new InvalidOperationException($"Failed to place reservation because some of the tickets were already reserved by another user.");
+            _logger.LogWarning($"Some tickets were unavialbe to reserve by user {userId}. Requested tickets {string.Join(", ", ticketIds)}");
+            return new TicketTransactionResponse
+            {
+                Success = false,
+                Message = "Failed to reserve because some of the tickets were not available.",
+            };
         }
 
         var success = await _ticketRepository.ReserveTicketsAsync(userId, ticketIds);
         if (!success)
         {
+            _logger.LogError($"DB error for reserve tickets by user {userId} for tickets {string.Join(", ", ticketIds)}");
             throw new InvalidOperationException("Failed to reserve tickets.");
         }
 
@@ -79,6 +86,7 @@ public class TicketService : ITicketService
 
         if (!success)
         {
+            _logger.LogError($"DB error for cancel reservation by user {userId} for tickets {string.Join(", ", ticketIds)}");
             throw new InvalidOperationException("Failed to cancel reservation.");
         }
 
@@ -106,24 +114,27 @@ public class TicketService : ITicketService
         // if number of tickets available doesn't equal number of tickets requested, throw exception
         if (ticketsToPurchase.Count != ticketIds.Count)
         {
-            throw new InvalidOperationException($"Failed to purchase because some of the tickets were not available.");
-        }
-
-        var success = await _ticketRepository.PurchaseTicketsAsync(userId, ticketIds);
-        if (!success)
-        {
-            throw new InvalidOperationException("Failed to purchase tickets.");
+            _logger.LogWarning($"Some tickets were unavialbe for purchase by user {userId}. Requested tickets {string.Join(", ", ticketIds)}");
+            return new TicketTransactionResponse
+            {
+                Success = false,
+                Message = "Failed to purchase because some of the tickets were not available.",
+            };
         }
 
         var paymentSuccess = await Call3rdPartyPaymentServiceAsync(ticketRequest);
         if (!paymentSuccess)
         {
-            var cancelSuccess = await _ticketRepository.CancelPurchaseAsync(userId, ticketIds);
-            if (!cancelSuccess)
-            {
-                _logger.LogError("Failed to cancel purchase on db side after payment failure.");
-            }
+            _logger.LogError($"Payment processing failed for user {userId} for tickets {string.Join(", ", ticketIds)}");
             throw new InvalidOperationException("Payment processing failed.");
+        }
+
+        // mark tickets as purchased in db
+        var success = await _ticketRepository.PurchaseTicketsAsync(userId, ticketIds);
+        if (!success)
+        {
+            _logger.LogError($"DB error for purchase by user {userId} for tickets {string.Join(", ", ticketIds)}");
+            throw new InvalidOperationException("Failed to purchase tickets.");
         }
 
         var response = new TicketTransactionResponse
@@ -142,4 +153,37 @@ public class TicketService : ITicketService
         return true;
     }
 
+    public Task<List<TicketResponse>> CreateTicketsAsync(List<CreateTicketRequest> createTicketRequests)
+    {
+        List<Ticket> tickets = new List<Ticket>();
+        foreach (var request in createTicketRequests)
+        {
+            var ticket = new Ticket
+            {
+                Id = Guid.NewGuid(),
+                EventId = request.EventId,
+                UserId = Guid.Empty, // Initially no user assigned
+                PurchaseDate = DateTime.MaxValue, // Not purchased yet
+                ReservedUntil = DateTime.MinValue, // Not reserved yet
+                TicketType = request.TicketType,
+                Price = request.Price,
+                Row = request.Row,
+                Seat = request.Seat
+            };
+            tickets.Add(ticket);
+        }
+
+        _ticketRepository.AddTicketsAsync(tickets);
+        
+        return Task.FromResult(tickets.Select(t => new TicketResponse
+        {
+            Id = t.Id,
+            EventId = t.EventId,
+            UserId = t.UserId,
+            TicketType = t.TicketType,
+            Price = t.Price,
+            Row = t.Row,
+            Seat = t.Seat
+        }).ToList());
+    }
 }

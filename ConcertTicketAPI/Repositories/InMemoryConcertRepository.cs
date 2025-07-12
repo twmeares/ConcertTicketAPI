@@ -156,4 +156,12 @@ public class InMemoryConcertRepository : IConcertRepository
         return Task.FromResult(true); // return true if all reservations were cancelled successfully
     }
 
+    public Task AddTicketsAsync(List<Ticket> tickets)
+    {
+        foreach (var ticket in tickets)
+        {
+            _tickets.Add(ticket);
+        }
+        return Task.CompletedTask;
+    }
 }

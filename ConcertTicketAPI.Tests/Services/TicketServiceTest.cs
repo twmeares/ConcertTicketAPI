@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 namespace ConcertTicketAPI.Tests.Services;
 public class TicketServiceTest
 {
-[Fact]
+    [Fact]
     public async Task GetByIdAsync_ReturnsListOfTickets_WhenEventAndTicketsExists()
     {
         // init deps
@@ -29,10 +29,18 @@ public class TicketServiceTest
         };
 
         await concertRepository.AddEventAsync(testEvent);
-
+        // create test tickets
+        var tickets = new List<Ticket>
+        {
+            new Ticket { Id = Guid.NewGuid(), EventId = eventId, Price = 50, TicketType = TicketTypes.GeneralAdmission },
+            new Ticket { Id = Guid.NewGuid(), EventId = eventId, Price = 50, TicketType = TicketTypes.GeneralAdmission }
+        };
+        await concertRepository.AddTicketsAsync(tickets);
         var result = await ticketService.GetAvailableTicketsByEventIdAsync(eventId);
 
         Assert.NotNull(result);
         Assert.IsType<List<TicketResponse>>(result);
+        Assert.Equal(2, result.Count);
+        Assert.Equal(eventId, result[0].EventId);
     }
 }
