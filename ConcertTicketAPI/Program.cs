@@ -13,6 +13,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddSingleton<IConcertRepository, InMemoryConcertRepository>();
 builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<ITicketService, TicketService>();
 
 var app = builder.Build();
 
